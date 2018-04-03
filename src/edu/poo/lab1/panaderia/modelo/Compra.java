@@ -15,12 +15,13 @@ public class Compra {
     private int cantidad;
     private Producto producto;
 
-    public Compra(double precio, int cantidad, Producto producto) {
+    public Compra(LocalDate fechaCompra, double precio, int cantidad, Producto producto) {
+        this.fechaCompra = fechaCompra;
         this.precio = precio;
         this.cantidad = cantidad;
         this.producto = producto;
     }
-
+    
     public double getPrecio() {
         return precio;
     }

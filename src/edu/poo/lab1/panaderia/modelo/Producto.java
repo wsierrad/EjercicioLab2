@@ -12,12 +12,14 @@ package edu.poo.lab1.panaderia.modelo;
 public class Producto {
     private String nombreProducto;
     private double precio;
+    private int cantidad;
 
-    public Producto(String nombreProducto, double precio) {
+    public Producto(String nombreProducto, double precio, int cantidad) {
         this.nombreProducto = nombreProducto;
         this.precio = precio;
+        this.cantidad = cantidad;
     }
-
+    
     public String getNombreProducto() {
         return nombreProducto;
     }
@@ -33,4 +35,13 @@ public class Producto {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+    
 }

@@ -12,17 +12,19 @@ import java.time.*;
  * @author willi_000
  */
 public class Panaderia {
-    public static String nombre;
-    public static String ubicacion;
-    public static String horario;
+    private String nombre;
+    private String ubicacion;
+    private String horario;
     private final ArrayList <Venta> ventas;
     private final ArrayList <Compra> compras;
     private final ArrayList <VentaMayorista> ventasMayoristas;
     private final HashMap <String, Producto> inventario;
     
     public double valorGanancias(LocalDate fechaInicio, LocalDate fechaFin){ 
-        double ganacia = this.valorVentas(fechaInicio, fechaFin) - 
-                this.valorCompras(fechaInicio, fechaFin);
+        LocalDate FI = fechaInicio.minusDays(1);
+        LocalDate FF = fechaFin.plusDays(1);
+        double ganacia = this.valorVentas(FI, FF) - 
+                this.valorCompras(FI, FF);
         return ganacia;
     }
     
@@ -85,9 +87,9 @@ public class Panaderia {
     }
     
     public Panaderia(String nombre, String ubicacion, String horario) {
-        Panaderia.nombre = nombre;
-        Panaderia.ubicacion = ubicacion;
-        Panaderia.horario = horario;
+        this.nombre = nombre;
+        this.ubicacion = ubicacion;
+        this.horario = horario;
         ventas = new ArrayList<>();
         compras = new ArrayList<>();
         ventasMayoristas = new ArrayList<>();
@@ -110,25 +112,49 @@ public class Panaderia {
         return ventas;
     }
 
-    public boolean addVenta(Producto produtoVenta, 
+    public boolean addVenta(Producto productoVenta, 
                         int cantidad,
                         LocalDate fechaVenta) {
-        Venta venta = new Venta(produtoVenta, cantidad, fechaVenta);
-        return ventas.add(venta);
+        
+        Venta venta=null;
+        int remanentes;
+        if(productoVenta!=null){
+            Producto p = this.consultaInventario(productoVenta.getNombreProducto());
+            venta = new Venta(productoVenta, cantidad, fechaVenta);
+            remanentes = p.getCantidad();
+            productoVenta.setCantidad(remanentes - cantidad);
+            this.inventario.remove(p.getNombreProducto());
+            this.inventario.put(productoVenta.getNombreProducto(), productoVenta);
+        }
+        if (venta == null)
+            return false;
+        else return ventas.add(venta);
     }
 
     public ArrayList<VentaMayorista> getVentasMayoristas() {
         return ventasMayoristas;
     }
 
-    public boolean addVentaMayorista(Producto produtoVenta, 
-                        int cantidad,
-                        LocalDate fechaVenta,
-                        String nombreCliente,
-                        double precio) {
-        VentaMayorista ventaMayorista = new VentaMayorista(nombreCliente, 
-                precio, produtoVenta, cantidad, fechaVenta);
-        return ventasMayoristas.add(ventaMayorista);
+    public boolean addVentaMayorista(Producto productoVenta, 
+        int cantidad,
+        LocalDate fechaVenta,
+        String nombreCliente,
+        double precio) {
+        VentaMayorista ventaMayorista=null;
+        int remanentes;
+        if(productoVenta!=null){
+            //System.out.println("entro");
+            Producto p = this.consultaInventario(productoVenta.getNombreProducto());
+            ventaMayorista = new VentaMayorista(nombreCliente, 
+                precio, productoVenta, cantidad, fechaVenta);
+            remanentes = p.getCantidad();
+            productoVenta.setCantidad(remanentes - cantidad);
+            this.inventario.remove(p.getNombreProducto());
+            this.inventario.put(productoVenta.getNombreProducto(), productoVenta);
+        }
+        if (ventaMayorista == null)
+            return false;
+        else return ventasMayoristas.add(ventaMayorista);
     }
     
     public HashMap<String, Producto> getInventario() {
@@ -136,8 +162,14 @@ public class Panaderia {
     }
 
     public boolean addProducto(Producto producto) {
-        Producto p = inventario.put(producto.getNombreProducto(), producto);
-        return p.equals(producto);
+        boolean result; 
+        Producto p = inventario.put(producto.getNombreProducto(), producto); 
+        if (p !=null){
+            String n1 = p.getNombreProducto();
+            String n2 = producto.getNombreProducto();
+            result=n1.equals(n2);
+        }else result = false;
+        return result;
     }
     
     public boolean removeProducto(Producto producto) {
@@ -151,5 +183,36 @@ public class Panaderia {
     public ArrayList<Compra> getCompras() {
         return compras;
     } 
+    
+    public boolean addCompra(LocalDate fechaCompra, double precio, int cantidad, Producto producto) {
+        Compra c=null;
+        int remanentes;
+        if(producto!=null){
+            //System.out.println("entro");
+            Producto p = this.consultaInventario(producto.getNombreProducto());
+            c = new Compra(fechaCompra, precio, cantidad, producto);
+            remanentes = p.getCantidad();
+            producto.setCantidad(remanentes + cantidad);
+            this.inventario.remove(p.getNombreProducto());
+            this.inventario.put(producto.getNombreProducto(), producto);
+        }
+        if (c==null)
+            return false;
+        else return this.compras.add(c);
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
+    }
+
+    public void setHorario(String horario) {
+        this.horario = horario;
+    }
+    
+    
     
 }

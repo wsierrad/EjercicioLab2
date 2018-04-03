@@ -10,10 +10,10 @@ import java.time.*;
  * @author willi_000
  */
 public class Venta {
-    private Producto producto;
-    private int cantidad;
-    private LocalDate fechaVenta;
-    private double valor;
+    protected Producto producto;
+    protected int cantidad;
+    protected LocalDate fechaVenta;
+    protected double valor;
 
     public Venta(Producto producto, int cantidad, LocalDate fechaVenta) {
         this.producto = producto;
